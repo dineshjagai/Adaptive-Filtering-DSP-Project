@@ -1,0 +1,23 @@
+%% 
+amplitudes = [-1 1];
+n_in = 0:999;
+s = zeros(1, 1000);
+for i=1:1000
+    val = randi(2);
+    s(i) = amplitudes(val);
+end
+
+h = [0.3 1 0.7 0.3 0.2];
+x = conv(s, h);
+w = wgn(1, length(x), 37);
+x = x + w;
+n_out = 1:length(x);
+
+figure
+stem(n_in, s)
+xlabel('n')
+ylabel('s[n]')
+title('
+
+figure
+stem(n_out, x);
