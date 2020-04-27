@@ -1,6 +1,6 @@
 
 # ESE531-Final-Project
-![adaptive Filter]()
+![adaptive Filter](https://github.com/dineshjagai/ESE531-Final-Project/blob/master/Images/Block-diagram-of-adaptive-filter.png)
 
 # Team-members 
   - Dinesh Jagai <dinesh97@seas.upenn.edu>
