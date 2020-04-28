@@ -196,11 +196,10 @@ x_full = x_noise_one + x_noise_two + x_desired;
 w = linspace(-pi, pi, num_iter);
 
 % Plot of Signal Generated for Filter one
-figure()
 subplot(2,1,1)
 plot(w/pi, abs(fftshift(fft(x))))
 xlabel('frequency, w/$\pi$', 'interpreter','latex');
-ylabel(sprintf('Frequency distributions, $X(e^{j\\omega})$ for our input signal,x(one)'),'interpreter','latex');
+ylabel(sprintf('Frequency distributions, $X(e^{j\\omega})$ for our input signal,x_one'),'interpreter','latex');
 title(sprintf('Frequency distribution, X(e^{jw}), for our input signal into filter one, where w_noise_one = %.2fpi, w_noise_two = %.2fpi, w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise_one,2*f_noise_two, 2*f_desire,r_one, r_two),'interpreter','latex');
 
 
@@ -224,7 +223,7 @@ x_two = x_noise_two + y_one;
 subplot(2,1,2)
 plot(w/pi, abs(fftshift(fft(x_two))))
 xlabel('frequency, w/$\pi$', 'interpreter','latex');
-ylabel(sprintf('Frequency distributions, $X(e^{j\\omega})$ for our input signal,x(two)'),'interpreter','latex');
+ylabel(sprintf('Frequency distributions, $X(e^{j\\omega})$ for our input signal,x_two'),'interpreter','latex');
 title(sprintf('Frequency distribution, X(e^{jw}), for our input signal into filter two, where w_noise_one = %.2fpi, w_noise_two = %.2fpi, w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise_one,2*f_noise_two, 2*f_desire,r_one, r_two),'interpreter','latex');
 
 for n = 3:num_iter - 1
@@ -242,12 +241,11 @@ H_adapt_two = ((1+a_fin*z.^(-1)+z.^(-2))./(1+r_two*a_fin*z.^(-1)+r_two^2*z.^(-2)
 % For visualizing the filter
 % fvtool(H_adapt)
 H_adapt = H_adapt_one .* H_adapt_two;
-figure()
 subplot(2,1,1)
 plot(w/pi, 20*log10(abs(H_adapt)));
 xlabel('frequency, w/$\pi$', 'interpreter','latex');
 ylabel(sprintf('Magnitude response of an Adaptive Notch filter, $H(e^{j\\omega})$ /dB'),'interpreter','latex');
-title(sprintf('Magnitude response of an Adaptive Notch filter, H(e^{jw}), to reject two sine comps where w_noise_one = %.2fpi, w_noise_two = %.2fpi, w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise_one,2*f_noise_two, 2*f_desire,r_one, r_two),'interpreter','latex');
+title(sprintf('Magnitude response of an Adaptive Notch filter, H(e^{jw}), to reject two sine comps where w_noise = %.2fpi,w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise,2*f_desire,r_one, r_two),'interpreter','latex');
 
 % Extract the filtered region from y by taking the last 2k samples
 % Extract the sample samples  from x for comparison sake
@@ -264,23 +262,22 @@ hold on
 plot(w_filt,abs(Y_filter));
 xlabel('frequency, w/$\pi$', 'interpreter','latex');
 ylabel(sprintf('Frequency distributions, $X(e^{j\\omega})$ and $Y(e^{j\\omega})$'),'interpreter','latex');
-title(sprintf('Frequency distributions, X(e^{jw})and Y(e^{jw}), where w_noise_one = %.2fpi, w_noise_two = %.2fpi, w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise_one,2*f_noise_two, 2*f_desire,r_one, r_two),'interpreter','latex');
+title(sprintf('Frequency distributions, X(e^{jw})and Y(e^{jw}) , where w_noise = %.2fpi,w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise,2*f_desire,r),'interpreter','latex');
 hold off
 l = legend('Input Signal, $X(e^{j\omega})$ ', 'Output signal,$Y(e^{j\omega})$');
 set(l, 'interpreter', 'latex')
 
-figure()
 subplot(2,1,1)
 plot(1:num_iter, a_one);
 xlabel('time,n ')
 ylabel(sprintf('Convergence Spectra, a_one,'),'interpreter','latex');
-title(sprintf('Convergence Spectra, a_one, for the adaptive cascaded filter part one where w_noise_one = %.2fpi, w_noise_two = %.2fpi, w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise_one,2*f_noise_two, 2*f_desire,r_one, r_two),'interpreter','latex');
+title(sprintf('Convergence Spectra, a_one, for the adaptive cascaded filter part one  where w_noise = %.2fpi,w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise,2*f_desire,r),'interpreter','latex');
 
 subplot(2,1,2)
 plot(1:num_iter, a_two);
 xlabel('time,n ')
 ylabel(sprintf('Convergence Spectra, a_two'),'interpreter','latex');
-title(sprintf('Convergence Spectra, a_two, for the adaptive filter two adaptive cascaded filter part two w_noise_one = %.2fpi, w_noise_two = %.2fpi, w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise_one,2*f_noise_two, 2*f_desire,r_one, r_two),'interpreter','latex');
+title(sprintf('Convergence Spectra, a_two, for the adaptive filter two adaptive cascaded filter part two where w_noise = %.2fpi,w_desire = %.2fpi, r_one = %.2f, r_two = %.2f ', 2*f_noise,2*f_desire,r),'interpreter','latex');
 
 %% -----------------------------------------------------------------------%% 
 
