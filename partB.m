@@ -21,9 +21,10 @@ ylabel('x[n]')
 title('Output Signal w/ Interference')
 
 %%  Train Adaptive Filter
+SNR = 25;
 h_filter = ones(1, 12);
 out = conv(train, h);
-out = awgn(out, 20);
+out = awgn(out, SNR);
 max_mu = 2 / (norm(out)^2);
 mu = 0.035;
 
@@ -37,14 +38,14 @@ for i=length(h_filter):length(train)
 end
 
 %% Test Adaptive Filter
-r = randi([0 1], 1, 20);
-r(r == 0) = -1;
-d = [zeros(1, 2) r];
-outr = awgn(conv(r, h), 30);
-figure
-stem(d, 'b')
-hold on
-stem(conv(outr, h_filter), '--r')
+% r = randi([0 1], 1, 20);
+% r(r == 0) = -1;
+% d = [zeros(1, 2) r];
+% outr = awgn(conv(r, h), 20);
+% figure
+% stem(d, 'b')
+% hold on
+% stem(conv(outr, h_filter), '--r')
 
 
 H_channel=freqz(h);       

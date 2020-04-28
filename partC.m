@@ -1,13 +1,11 @@
 %% 
-f = [0 0.125 0.125 1];
-m = [1 1 0 0];
+x = 0:999;
+x = sin(x);
+n = 99;
+fp = 0.48;
+[h0,h1,g0,g1] = firpr2chfb(n,fp);
+[h00,h01,g00,g01] = firpr2chfb(n,fp);
+[h000,h001,g000,g001] = firpr2chfb(n,fp);
+fvtool(h0,1,h1,1,g0,1,g1,1);
 
-b1 = fir2(30,f,m);
-[h1,w] = freqz(b1,1);
-
-plot(f,m,w/pi,abs(h1))
-xlabel('\omega / \pi')
-lgs = {'Ideal','fir2 default'};
-legend(lgs)
-
-fvtool(b1)
+x0 = conv(x, h0);
