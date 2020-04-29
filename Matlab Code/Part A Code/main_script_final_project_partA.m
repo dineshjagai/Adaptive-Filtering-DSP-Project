@@ -2,28 +2,33 @@
 close all
 clear variables
 clc 
-
+    
 %% -----------------------------------------------------------------------%% 
-%Part A
+                                    %Part A
 % constants
-num_iter = 15000; 
+% Basline =  mu = 0.000009; r = 0.95, f = 0.4, p = 5 
+% Graphing Purposes 
+% mu = [0.000009 0.0009 0.009]
+% r = [0.85 0.89 .91 0.95 0.98]
+% f = [0.5 0.2 0.05]
+% p = [5 1 20]
+p = 5; 
+r = 0.95;
+f = 0.4; 
+num_iter = 80000; 
 r_range = [0.85, 0.86, 0.87, 0.88, 0.89, 0.90, 0.91, 0.92, 0.93,... 
-           0.94, 0.95, 0.96, 0.97, 0.98]; 
-r = 0.95;        
-% w_noise = .2*pi 
-% w_desire = pi
-f_noise = 0.4; % frequency of sinusoid signal we want to remove(High inference)
-f_desire = 0.2; % frequency of sinusoid signal we want
+           0.94, 0.95, 0.96, 0.97, 0.98];
+f_noise = f; % frequency of sinusoid signal we want to remove(High inference)
+f_desire = 0.3; % frequency of sinusoid signal we want
 mu = 0.000009; %small mu reauired to converge
-
 % sequences
 e = zeros(1,num_iter); % intermediate Sequence
 y = zeros(1, num_iter); % output sequence 
 a = zeros(1, num_iter); % Coefficients of a 
 range = 1:num_iter;
-x_noise = 20 * sin(2*pi*f_noise*range); % sinusoidal noise with Strong interference 
+x_noise =  p*sin(2*pi*f_noise*range); % sinusoidal noise with Strong interference 
 x_desired = sin(2*pi*f_desire*range); % signal desired without random noise)
-% x_desired = x_desired + randn(size(range)); % Add noise to signal
+% x_desired = x_desired + 100*randn(size(range)); % Add noise to signal
 
 x = x_noise + x_desired; 
 w = linspace(-pi, pi, num_iter);
@@ -33,7 +38,7 @@ figure()
 plot(w/pi, abs(fftshift(fft(x))))
 xlabel('frequency, w/$\pi$', 'interpreter','latex');
 ylabel(sprintf('Frequency distributions, $X(e^{j\\omega})$ for our input signal,x'),'interpreter','latex');
-title(sprintf('Frequency distribution, X(e^{jw}), for our input signal , where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f', 2*f_noise,2*f_desire,r),'interpreter','latex');
+title(sprintf('Baseline Frequency distribution, X(e^{jw}), for our input signal , where w_noise = %.2fpi,w_desire = %.2fpi, p = %.2f', 2*f_noise,2*f_desire, p),'interpreter','latex');
 
 % Simple Algorithm to minimize E(y[n]^2) 
 for n = 3:num_iter - 1
@@ -44,7 +49,7 @@ for n = 3:num_iter - 1
     else 
         a(n) = 0;
     end
-    
+
 end
 
 a_fin = a(num_iter);
@@ -52,13 +57,13 @@ a_fin = a(num_iter);
 z = exp(1i*w); 
 H_adapt = ((1+a_fin*z.^(-1)+z.^(-2))./(1+r*a_fin*z.^(-1)+r^2*z.^(-2))); 
 % For visualizing the filter
-fvtool(H_adapt)
-
+% fvtool(H_adapt)
+figure()
 subplot(2,1,1)
 plot(w/pi, 20*log10(abs(H_adapt)));
 xlabel('frequency, w/$\pi$', 'interpreter','latex');
 ylabel(sprintf('Magnitude response of an Adaptive Notch filter, $H(e^{j\\omega})$ /dB'),'interpreter','latex');
-title(sprintf('Magnitude response of an Adaptive Notch filter, H(e^{jw}), where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f', 2*f_noise,2*f_desire,r),'interpreter','latex');
+title(sprintf('Magnitude response of an Adaptive Notch filter, H(e^{jw}), where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f, p = %.2f', 2*f_noise,2*f_desire,r,p),'interpreter','latex');
 
 
 % Extract the filtered region from y by taking the last 2k samples
@@ -76,7 +81,7 @@ hold on
 plot(w_filt,abs(Y_filter));
 xlabel('frequency, w/$\pi$', 'interpreter','latex');
 ylabel(sprintf('Frequency distributions, $X(e^{j\\omega})$ and $Y(e^{j\\omega})$'),'interpreter','latex');
-title(sprintf('Frequency distributions, X(e^{jw})and Y(e^{jw}) , where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f', 2*f_noise,2*f_desire,r),'interpreter','latex');
+title(sprintf('Frequency distributions, X(e^{jw})and Y(e^{jw}) , where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f, p = %.2f', 2*f_noise,2*f_desire,r, p),'interpreter','latex');
 hold off
 l = legend('Input Signal, $X(e^{j\omega})$ ', 'Output signal,$Y(e^{j\omega})$');
 set(l, 'interpreter', 'latex')
@@ -84,13 +89,16 @@ figure
 plot(1:num_iter, a);
 xlabel('time,n ')
 ylabel(sprintf('Convergence Spectra, a'),'interpreter','latex');
-title(sprintf('Convergence Spectra, a where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f', 2*f_noise,2*f_desire,r),'interpreter','latex');
+title(sprintf('Convergence Spectra, a where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f, p = %.2f', 2*f_noise,2*f_desire,r, p),'interpreter','latex');
+fprintf('mu_%.7f-f_noise_%.2f-r_%.2f-p_%.2f_without_noise\n',mu,f_noise,r,p);
 
 
 %% -----------------------------------------------------------------------%% 
-%Part B
+                                   %Part B
 % constants
-num_iter = 15000; 
+% All converges around this point (n.b. all graphs were check to make sure
+% they converged) 
+num_iter = 30000; 
 r = 0.95; 
 mu = 0.000009; %small mu reauired to converge
 for f = 0:0.03:0.45   
@@ -103,7 +111,7 @@ for f = 0:0.03:0.45
     y = zeros(1, num_iter); % output sequence 
     a = zeros(1, num_iter); % Coefficients of a 
     range = 1:num_iter;
-    x_noise = 20 * sin(2*pi*f_noise*range); % sinusoidal noise with Strong interference 
+    x_noise = 5 * sin(2*pi*f_noise*range); % sinusoidal noise with Strong interference 
     x_desired = sin(2*pi*f_desire*range); % signal desired without random noise)
     % x_desired = x_desired + randn(size(range)); % Add noise to signal
 
@@ -162,20 +170,21 @@ for f = 0:0.03:0.45
     hold off
     l = legend('Input Signal, $X(e^{j\omega})$ ', 'Output signal,$Y(e^{j\omega})$');
     set(l, 'interpreter', 'latex')
-    figure
-    plot(1:num_iter, a);
-    xlabel('time,n ')
-    ylabel(sprintf('Convergence Spectra, a'),'interpreter','latex');
-    title(sprintf('Convergence Spectra, a where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f', 2*f_noise,2*f_desire,r),'interpreter','latex');
+%     figure
+%     plot(1:num_iter, a);
+%     xlabel('time,n ')
+%     ylabel(sprintf('Convergence Spectra, a'),'interpreter','latex');
+%     title(sprintf('Convergence Spectra, a where w_noise = %.2fpi,w_desire = %.2fpi, r = %.2f', 2*f_noise,2*f_desire,r),'interpreter','latex');
 end
 %% -----------------------------------------------------------------------%% 
-%Part C
+                                   %Part C
 % constants
 r_one = 0.95; 
 r_two = 0.94;
 mu_one = 0.000009; %small mu reauired to converge
 mu_two = 0.000009; %small mu reauired to converge
-num_iter = 15000; 
+num_iter = 80000; 
+% For weaker interference signals it requires more iterations
 f_noise_one = 0.4; % frequency of sinusoid signal we want to remove(High inference)
 f_noise_two = 0.1; % frequency of second sinusoid signal we want to remove(High inference)
 f_desire = 0.2; % frequency of sinusoid signal we want
@@ -188,8 +197,8 @@ y_two = zeros(1, num_iter); % output sequence two
 a_one = zeros(1, num_iter); % Coefficients of a one
 a_two = zeros(1, num_iter); % Coefficients of a two
 range = 1:num_iter;
-x_noise_one = 20 * sin(2*pi*f_noise_one*range); % sinusoidal one noise with Strong interference 
-x_noise_two = 20 * sin(2*pi*f_noise_two*range); % sinusoidal two noise with Strong interference 
+x_noise_one = 5 * sin(2*pi*f_noise_one*range); % sinusoidal one noise with Strong interference 
+x_noise_two = 5 * sin(2*pi*f_noise_two*range); % sinusoidal two noise with Strong interference 
 x_desired = sin(2*pi*f_desire*range); % signal desired 
 x = x_noise_one + x_desired;
 x_full = x_noise_one + x_noise_two + x_desired;
