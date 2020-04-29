@@ -21,12 +21,13 @@ ylabel('x[n]')
 title('Output Signal w/ Interference')
 
 %%  Train Adaptive Filter
-SNR = 25;
-h_filter = ones(1, 12);
+SNR = 20;
+filter_length = 12;
+h_filter = ones(1, filter_length);
 out = conv(train, h);
 out = awgn(out, SNR);
 max_mu = 2 / (norm(out)^2);
-mu = 0.035;
+mu = 0.05;
 
 desired = [zeros(1, 2) train];
 
@@ -38,15 +39,6 @@ for i=length(h_filter):length(train)
 end
 
 %% Test Adaptive Filter
-% r = randi([0 1], 1, 20);
-% r(r == 0) = -1;
-% d = [zeros(1, 2) r];
-% outr = awgn(conv(r, h), 20);
-% figure
-% stem(d, 'b')
-% hold on
-% stem(conv(outr, h_filter), '--r')
-
 
 H_channel=freqz(h);       
 w=(0:length(H_channel)-1)./(length(H_channel));         
@@ -65,15 +57,48 @@ xlabel('w (rad/s)');
 ylabel('Magnitude (dB)');
 title('Magnitude response');
 
-figure
-plot(w, H_channel_inv_phase)
-hold on
-plot(w, H_adaptive_phase)
-legend('Desired Spectrum','Adaptive Spectrum');
-xlabel('w (rad/s)');
-ylabel('Phase (rad)');
-title('Phase response');
+%% Plots of channel and filter
+
+fvtool(h);
+fvtool(h_filter);
+
+
+%% Overall LTI system
+
+h_overall = conv(h, h_filter);
+fvtool(h_overall);
 
 %% 
 
+test = randi([0 1], 1, 3000);
+test(test == 0) = -1;
 
+channel_out = conv(test, h);
+acc_channel = 0;
+for i=1:length(test)
+    if (channel_out(i) > 0)
+        channel_out(i) = 1;
+    else
+        channel_out(i) = -1;
+    end
+    
+    if (channel_out(i) == test(i)) 
+        acc_channel = acc_channel + 1;
+    end
+end
+acc_channel = acc_channel / length(test);
+equalized = conv(channel_out, h_filter);
+
+acc_eq = 0;
+for i=1:length(test)
+    if (equalized(i) > 0)
+        equalized(i) = 1;
+    else
+        equalized(i) = -1;
+    end
+    
+    if (equalized(i) == test(i)) 
+        acc_eq = acc_eq + 1;
+    end
+end
+acc_eq = acc_eq / length(test);

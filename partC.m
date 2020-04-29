@@ -1,11 +1,30 @@
 %% 
-x = 0:999;
-x = sin(x);
-n = 99;
-fp = 0.48;
-[h0,h1,g0,g1] = firpr2chfb(n,fp);
-[h00,h01,g00,g01] = firpr2chfb(n,fp);
-[h000,h001,g000,g001] = firpr2chfb(n,fp);
-fvtool(h0,1,h1,1,g0,1,g1,1);
+n = 0:99;
+w = 0.2*pi;
+w1 = 0.4*pi;
+w2 = 0.1*pi;
+x = sin(w.*n) + sin(w1.*pi);
 
-x0 = conv(x, h0);
+out = multibank(x, 1, 1, 1, 1);
+
+out1 = davis(x);
+
+figure
+stem(x)
+hold on
+stem(out)
+legend('Input, x[n]', 'Output, y[n]')
+xlabel('n')
+title('Output vs Input of Multirate Filter Bank')
+
+%% 
+
+speech_out = multibank(nspeech2', 1, 1, 1, 1);
+
+figure 
+plot(linspace(-pi, pi, length(nspeech2'))./pi, abs(fft(nspeech2')))
+hold on
+plot(linspace(-pi, pi, length(speech_out))./pi, abs(fft(speech_out)))
+legend('Input Speech', 'Output Speech')
+xlabel('w (rad/s) (Normalized to pi)')
+title('Effect of Filter Bank on Speech')

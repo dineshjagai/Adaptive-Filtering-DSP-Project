@@ -1,0 +1,60 @@
+function [y] = multibank(x)
+%UNTITLED3 Summary of this function goes here
+%   Detailed explanation goes here
+n = 99;
+fp = 0.48;
+[hL,hH,gL,gH] = firpr2chfb(n,fp);
+
+% % band 1 -> 0, pi/8
+% x0 = conv(x, h0); 
+% x0 = downsample(x0, 2);
+% x_band1 = downsample(conv(downsample(conv(x0, h0), 2), h0),2);
+% x_band1 = x_band1(50:length(x_band1)-1);
+% 
+% x_band2 = downsample(conv(downsample(conv(x0, h0), 2), h1),2);
+% x_band2 = x_band2(50:length(x_band2)-1);
+% 
+% x_band3 = downsample(conv(x0, h1),2);
+% x_band3 = x_band3(50:length(x_band3)-1);
+% 
+% x_band4 = downsample(conv(x, h1), 2);
+% x_band4 = x_band4(50:length(x_band4)-1);
+% 
+% y_band4 = conv(upsample(x_band4, 2), g1);
+% 
+% y_band3 = conv(upsample(x_band3, 2), g1);
+% 
+% y_band2 = conv(upsample(x_band2, 2), g1);
+% y_band1 = conv(upsample(x_band1, 2), g0);
+% 
+% y_band12 = conv(y_band1 + y_band2, g0);
+% 
+% y_band123 = y_band12 + padarray(y_band3, [0 length(y_band12)-length(y_band3)], 'post');
+% 
+% l = length(conv(upsample(y_band123,2), g0));
+% y = conv(upsample(y_band123,2), g0) + padarray(y_band4, [0 abs(length(y_band4)-l)], 'post');
+% y = y(1:length(x));
+
+j = conv(x, hL);
+step1 = downsample(j, 2);
+ba1 = downsample(conv(downsample(conv(step1, hL),2), hL), 2);
+ba1 = ba1(50:length(ba1)-1);
+
+ba2 = downsample(conv(downsample(conv(downsample(conv(x, hL), 2), hL), 2), hH), 2);
+ba2 = ba2(50:length(ba2)-1);
+ba3 = downsample(conv(downsample(conv(x, hL),2), hH), 2);
+ba3 = ba3(50:length(ba3)-1);
+
+ba4 = downsample(conv(x, hH),2);
+ba4 = ba4(50:length(ba4)-1);
+
+band_3_resynthed = conv(upsample(ba4, 2), gH);
+band_0_interm = conv(upsample(ba1, 2), gL);
+band_1_interm = conv(upsample(ba2, 2), gH);
+band_01_interm = band_0_interm + band_1_interm;
+band_01_resynthed = conv(upsample(band_01_interm, 2), gL);
+band_2_interm = conv(upsample(ba3, 2), gH);
+
+band_
+end
+
