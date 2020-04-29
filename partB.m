@@ -1,11 +1,7 @@
-%% Setup
-amplitudes = [-1 1];
+%% Generate training signal
 n_in = 0:999;
-train = zeros(1, 1000);
-for i=1:1000
-    val = randi(2);
-    train(i) = amplitudes(val);
-end
+train = randi([0 1], 1, 1000);
+train(train == 0) = -1;
 
 h = [0.3 1 0.7 0.3 0.2];
 x = conv(train, h);
@@ -24,10 +20,60 @@ xlabel('n')
 ylabel('x[n]')
 title('Output Signal w/ Interference')
 
-%% 
+%%  Train Adaptive Filter
+SNR = 25;
+h_filter = ones(1, 12);
+out = conv(train, h);
+out = awgn(out, SNR);
+max_mu = 2 / (norm(out)^2);
+mu = 0.035;
 
-learning_rate = 0.01;
-h_filter = zeros(1, length(h));
-delay = zeros
+desired = [zeros(1, 2) train];
+
+for i=length(h_filter):length(train)
+   outn = out(i-length(h_filter)+1:i);
+   s_hat = outn*h_filter';
+   e = desired(i) - s_hat;
+   h_filter = h_filter + mu*e*outn;
+end
+
+%% Test Adaptive Filter
+% r = randi([0 1], 1, 20);
+% r(r == 0) = -1;
+% d = [zeros(1, 2) r];
+% outr = awgn(conv(r, h), 20);
+% figure
+% stem(d, 'b')
+% hold on
+% stem(conv(outr, h_filter), '--r')
+
+
+H_channel=freqz(h);       
+w=(0:length(H_channel)-1)./(length(H_channel));         
+H_channel_inv_mag=-10*log10(real(H_channel).^2 + imag(H_channel).^2);  
+H_channel_inv_phase=-imag(H_channel)./real(H_channel);                    
+H_adaptive=freqz(h_filter);       
+H_adaptive_mag=10*log10(real(H_adaptive).^2 + imag(H_adaptive).^2);    
+H_adaptive_phase=imag(H_adaptive)./real(H_adaptive);   
+
+figure 
+plot(w,H_channel_inv_mag)
+hold on
+plot(w,H_adaptive_mag)
+legend('Desired Spectrum','Adaptive Spectrum');
+xlabel('w (rad/s)');
+ylabel('Magnitude (dB)');
+title('Magnitude response');
+
+figure
+plot(w, H_channel_inv_phase)
+hold on
+plot(w, H_adaptive_phase)
+legend('Desired Spectrum','Adaptive Spectrum');
+xlabel('w (rad/s)');
+ylabel('Phase (rad)');
+title('Phase response');
+
+%% 
 
 
